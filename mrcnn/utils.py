@@ -302,11 +302,12 @@ class Dataset(object):
             return ",".join(name.split(",")[:1])
 
         # Build (or rebuild) everything else from the info dicts.
-        self.num_classes = len(self.class_info)
-        self.class_ids = np.arange(self.num_classes)
-        self.class_names = [clean_name(c["name"]) for c in self.class_info]
-        self.num_images = len(self.image_info)
-        self._image_ids = np.arange(self.num_images)
+        # internal IDs实际上是info信息的索引list
+        self.num_classes = len(self.class_info)                              # 类别数目
+        self.class_ids = np.arange(self.num_classes)                         # internal 类别IDs
+        self.class_names = [clean_name(c["name"]) for c in self.class_info]  # 类别名简洁版
+        self.num_images = len(self.image_info)                               # 图片数目
+        self._image_ids = np.arange(self.num_images)                         # internal 类别IDs
 
         # Mapping from source class and image IDs to internal IDs
         self.class_from_source_map = {"{}.{}".format(info['source'], info['id']): id
@@ -316,7 +317,7 @@ class Dataset(object):
 
         # Map sources to class_ids they support
         self.sources = list(set([i['source'] for i in self.class_info]))
-        self.source_class_ids = {}
+        self.source_class_ids = {}  # source对应的internal 类别IDs
         # Loop over datasets
         for source in self.sources:
             self.source_class_ids[source] = []
@@ -438,7 +439,7 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
     if max_dim and mode == "square":
         image_max = max(h, w)
         if round(image_max * scale) > max_dim:
-            scale = max_dim / image_max
+            scale = max_dim / image_max  # 保证image_mx*scale等于max_dim
 
     # Resize image using bilinear interpolation
     if scale != 1:
@@ -603,17 +604,18 @@ def generate_anchors(scales, ratios, shape, feature_stride, anchor_stride):
     shifts_x, shifts_y = np.meshgrid(shifts_x, shifts_y)
 
     # Enumerate combinations of shifts, widths, and heights
-    box_widths, box_centers_x = np.meshgrid(widths, shifts_x)
-    box_heights, box_centers_y = np.meshgrid(heights, shifts_y)
+    box_widths, box_centers_x = np.meshgrid(widths, shifts_x)    # (n, 3) (n, 3)
+    box_heights, box_centers_y = np.meshgrid(heights, shifts_y)  # (n, 3) (n, 3)
 
     # Reshape to get a list of (y, x) and a list of (h, w)
-    box_centers = np.stack(
-        [box_centers_y, box_centers_x], axis=2).reshape([-1, 2])
+    # (n, 3, 2) -> (3n, 2)
+    box_centers = np.stack([box_centers_y, box_centers_x], axis=2).reshape([-1, 2])
     box_sizes = np.stack([box_heights, box_widths], axis=2).reshape([-1, 2])
 
     # Convert to corner coordinates (y1, x1, y2, x2)
     boxes = np.concatenate([box_centers - 0.5 * box_sizes,
                             box_centers + 0.5 * box_sizes], axis=1)
+    # 框体信息是相对于原图的, [N, (y1, x1, y2, x2)]
     return boxes
 
 
@@ -628,12 +630,22 @@ def generate_pyramid_anchors(scales, ratios, feature_shapes, feature_strides,
         with the same order of the given scales. So, anchors of scale[0] come
         first, then anchors of scale[1], and so on.
     """
+    # self.config.RPN_ANCHOR_SCALES,  # (32, 64, 128, 256, 512)
+    # self.config.RPN_ANCHOR_RATIOS,  # [0.5, 1, 2]
+    # backbone_shapes,  # with shape [N, (height, width)]
+    # self.config.BACKBONE_STRIDES,  # [4, 8, 16, 32, 64]
+    # self.config.RPN_ANCHOR_STRIDE)  # 1
+
     # Anchors
     # [anchor_count, (y1, x1, y2, x2)]
     anchors = []
     for i in range(len(scales)):
-        anchors.append(generate_anchors(scales[i], ratios, feature_shapes[i],
-                                        feature_strides[i], anchor_stride))
+        anchors.append(generate_anchors(scales[i],
+                                        ratios,
+                                        feature_shapes[i],
+                                        feature_strides[i],
+                                        anchor_stride))
+    # [anchor_count, (y1, x1, y2, x2)]
     return np.concatenate(anchors, axis=0)
 
 
@@ -819,14 +831,38 @@ def batch_slice(inputs, graph_fn, batch_size, names=None):
         if not isinstance(output_slice, (tuple, list)):
             output_slice = [output_slice]
         outputs.append(output_slice)
+
+    # 使用tf.while_loop实现循环体代码如下：
+    # import tensorflow as tf
+    # i = 0
+    # outputs = []
+    #
+    # def cond(index):
+    #     return index < batch_size  # 返回bool值
+    #
+    # def body(index):
+    #     index += 1
+    #     inputs_slice = [x[i] for x in inputs]
+    #     output_slice = graph_fn(*inputs_slice)
+    #     if not isinstance(output_slice, (tuple, list)):
+    #         output_slice = [output_slice]
+    #     outputs.append(output_slice)
+    #     return index  # 返回cond需要的判断参数进行下一次判断
+    #
+    # tf.while_loop(cond, body, [i])
+
     # Change outputs from a list of slices where each is
     # a list of outputs to a list of outputs and each has
     # a list of slices
+    # 下面示意中假设每次graph_fn返回两个tensor
+    # [[tensor11, tensor12], [tensor21, tensor22], ……]
+    # ——> [(tensor11, tensor21, ……), (tensor12, tensor22, ……)]  zip返回的是多个tuple
     outputs = list(zip(*outputs))
 
     if names is None:
         names = [None] * len(outputs)
 
+    # 一般来讲就是batch维度合并回去（上面的for循环实际是将batch拆分了）
     result = [tf.stack(o, axis=0, name=n)
               for o, n in zip(outputs, names)]
     if len(result) == 1:
