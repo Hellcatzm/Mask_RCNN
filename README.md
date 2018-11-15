@@ -15,6 +15,7 @@
 [『计算机视觉』Mask-RCNN_训练网络其一：数据集与Dataset类](https://www.cnblogs.com/hellcat/p/9881322.html)<br>
 [『计算机视觉』Mask-RCNN_训练网络其二：train网络结构](https://www.cnblogs.com/hellcat/p/9907837.html)<br>
 #### 相关知识点学习
+[『TensorFlow』分类问题与交叉熵](https://www.cnblogs.com/hellcat/p/8568005.html)<br>
 [『计算机视觉』感受野和anchor](https://www.cnblogs.com/hellcat/p/9946340.html)<br>
 [『计算机视觉』FPN特征金字塔网络](https://www.cnblogs.com/hellcat/p/9741213.html)<br>
 [『计算机视觉』经典RCNN_其一：从RCNN到Faster-RCNN](https://www.cnblogs.com/hellcat/p/9629942.html)<br>
