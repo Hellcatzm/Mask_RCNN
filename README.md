@@ -1,7 +1,7 @@
 # Mask_RCNN学习整理
 
 #### Mask_RCNN学习系列博客
-博客中介绍的代码主要是`./mrcnn`中的文件，它们是模型构建的主干，以及部分`./sample`中的文件，它们展示了如何训练测试网络，以及观察中间参数的方法。<br>
+博客中介绍的代码主要是`./mrcnn`中的文件，它们是模型构建的主干，以及部分`./sample`中的文件，它们展示了如何训练并测试网络<br>
 [『计算机视觉』Mask-RCNN_论文学习](https://www.cnblogs.com/hellcat/p/9749538.html)<br>
 [『计算机视觉』Mask-RCNN_项目文档翻译](https://www.cnblogs.com/hellcat/p/9759328.html)<br>
 [『计算机视觉』Mask-RCNN_推断网络其一：总览](https://www.cnblogs.com/hellcat/p/9789879.html)<br>
