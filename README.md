@@ -1,6 +1,7 @@
 # Mask_RCNN学习整理
 
 #### Mask_RCNN学习系列博客
+博客中介绍的代码主要是`./mrcnn`中的文件，它们是模型构建的主干，以及部分`./sample`中的文件，它们展示了如何训练测试网络，以及观察中间参数的方法。<br>
 [『计算机视觉』Mask-RCNN_论文学习](https://www.cnblogs.com/hellcat/p/9749538.html)<br>
 [『计算机视觉』Mask-RCNN_项目文档翻译](https://www.cnblogs.com/hellcat/p/9759328.html)<br>
 [『计算机视觉』Mask-RCNN_推断网络其一：总览](https://www.cnblogs.com/hellcat/p/9789879.html)<br>
@@ -18,3 +19,9 @@
 [『计算机视觉』FPN特征金字塔网络](https://www.cnblogs.com/hellcat/p/9741213.html)<br>
 [『计算机视觉』经典RCNN_其一：从RCNN到Faster-RCNN](https://www.cnblogs.com/hellcat/p/9629942.html)<br>
 [『计算机视觉』经典RCNN_其二：Faster-RCNN](https://www.cnblogs.com/hellcat/p/9678467.html)<br>
+
+#### 训练和测试
+在上面博客中其实已经有介绍相关脚本的使用方式，这里还是更直接的给出代码链接:<br>
+模拟训练模型脚本：[./sample/shapes/train_shapes.ipynb](https://github.com/Hellcatzm/Mask_RCNN/blob/master/samples/shapes/train_shapes.ipynb)<br>
+coco预训练模型测试脚本：[./sample/demo.ipynb](https://github.com/Hellcatzm/Mask_RCNN/blob/master/samples/demo.ipynb)<br>
+coco数据训练脚本：[./samples/coco/coco.py](https://github.com/Hellcatzm/Mask_RCNN/tree/master/samples/coco)<br>
